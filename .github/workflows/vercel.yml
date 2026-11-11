@@ -21,7 +21,7 @@ jobs:
 
     environment:
       name: Vercel Production
-      url: ${{ steps.vercel.outputs.url }}
+      url: https://spark-inspect.vercel.app
 
     steps:
       - name: Checkout
