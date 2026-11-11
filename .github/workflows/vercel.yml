@@ -1,0 +1,72 @@
+
+name: Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: Vercel Production
+      url: ${{ steps.vercel.outputs.url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Clear previous deployments
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          deployments=$(gh api --paginate \
+            "repos/$GITHUB_REPOSITORY/deployments" |
+            jq -s 'add // []')
+
+          latest_id=$(jq -r 'max_by(.created_at).id // empty' <<< "$deployments")
+
+          jq -r --arg latest "$latest_id" \
+            '.[] | select((.id | tostring) != $latest) | .id' \
+            <<< "$deployments" |
+          while read -r id; do
+            gh api --method POST \
+              "repos/$GITHUB_REPOSITORY/deployments/$id/statuses" \
+              -f state=inactive \
+              -f description="Superseded by latest production deployment"
+
+            gh api --method DELETE \
+              "repos/$GITHUB_REPOSITORY/deployments/$id"
+          done
+
+      - name: Link Vercel project
+        env:
+          VERCEL_PROJECT_JSON: ${{ secrets.VERCEL_PROJECT_JSON }}
+        run: |
+          mkdir -p .vercel
+          printf '%s' "$VERCEL_PROJECT_JSON" > .vercel/project.json
+
+      - name: Deploy to Vercel
+        id: vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        shell: bash
+        run: |
+          rm -rf .vercel
+          url=$(npx vercel@latest deploy --prod --yes \
+            --token "$VERCEL_TOKEN" --project "$VERCEL_PROJECT_ID" .)
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Deployed to: $url"

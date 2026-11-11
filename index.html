@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Deterministic Lucko Spark profiler report inspector.">
+    <title>Spark Inspect</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="shell">
+        <section class="intro">
+          <div class="intro-copy">
+            <h1>Find what is<br><span>costing your server.</span></h1>
+            <p>Turn a Spark profiler link into a clear, searchable workbench for plugin usage, call trees, server health, and JVM details.</p>
+          </div>
+        </section>
+
+        <section class="loader panel">
+          <div class="loader-copy">
+            <div><label for="report-input">Inspect a profiler</label><p>Paste a Spark URL or report code to begin.</p></div>
+            <span class="loader-status"><i></i> deterministic · agent-ready</span>
+          </div>
+          <div class="loader-row">
+            <input id="report-input" autocomplete="off" spellcheck="false" placeholder="https://spark.lucko.me/…">
+            <button id="inspect-button" class="button primary" type="button">Load report</button>
+          </div>
+          <div id="status" class="status" role="status" aria-live="polite"></div>
+        </section>
+
+        <section class="landing-features" aria-label="Inspection features">
+          <article class="feature-card feature-primary">
+            <span class="feature-index">01</span>
+            <div><strong>Plugin attribution</strong><p>See which plugins and methods consume the most sampled time.</p></div>
+            <span class="feature-arrow">↗</span>
+          </article>
+          <article class="feature-card">
+            <span class="feature-index">02</span>
+            <div><strong>Call trees</strong><p>Expand the exact path from thread to expensive method.</p></div>
+            <span class="feature-arrow">↗</span>
+          </article>
+          <article class="feature-card">
+            <span class="feature-index">03</span>
+            <div><strong>Built for agents</strong><p>Deterministic JSON, no AI guesses, no installation required.</p></div>
+            <span class="feature-arrow">↗</span>
+          </article>
+        </section>
+
+      <section id="results" hidden>
+        <div class="report-head">
+          <div>
+            <div class="eyebrow">decoded report <span id="report-type"></span></div>
+            <h2 id="report-title">Report</h2>
+            <p id="report-subtitle" class="muted"></p>
+          </div>
+          <button id="copy-button" class="button secondary" type="button">Copy JSON</button>
+        </div>
+
+        <nav class="tabs" aria-label="Report sections">
+          <button class="tab active" data-tab="overview" type="button">Overview</button>
+          <button class="tab" data-tab="sampler" type="button">Sampler</button>
+          <button class="tab" data-tab="health" type="button">Health & metrics</button>
+          <button class="tab" data-tab="system" type="button">System</button>
+          <button class="tab" data-tab="configurations" type="button">Server configurations</button>
+          <button class="tab" data-tab="plugins" type="button">Plugins</button>
+          <button class="tab" data-tab="raw" type="button">Raw data</button>
+        </nav>
+
+        <div id="tab-overview" class="tab-panel">
+          <div id="hero-metrics" class="metric-grid"></div>
+          <div class="dashboard-grid">
+            <article class="panel span-2">
+              <div class="card-head"><h3>Top sampled nodes</h3><span class="muted">aggregated sampled time</span></div>
+              <div id="hotspots" class="table-wrap"></div>
+            </article>
+            <article class="panel">
+              <div class="card-head"><h3>Platform</h3><span class="muted">report metadata</span></div>
+              <dl id="platform-details" class="details"></dl>
+            </article>
+            <article class="panel">
+              <div class="card-head"><h3>Sources</h3><span class="muted">plugins / mods</span></div>
+              <div id="sources" class="chips"></div>
+            </article>
+            <article class="panel">
+              <div class="card-head"><h3>Threads</h3><span class="muted">sample roots</span></div>
+              <div id="threads" class="list"></div>
+            </article>
+          </div>
+        </div>
+
+        <div id="tab-sampler" class="tab-panel" hidden>
+          <div class="panel">
+            <div class="card-head"><h3>Call tree</h3><span class="muted">same hierarchy as Spark</span></div>
+            <div class="tree-toolbar"><label for="thread-select">Thread</label><select id="thread-select"></select><span id="tree-status" class="muted"></span></div>
+            <div id="call-tree" class="call-tree"></div>
+          </div>
+          <div class="panel sampler-search-panel">
+            <div class="card-head"><h3>Search sampler nodes</h3><span class="muted">method, class, or thread</span></div>
+            <div class="search-row"><input id="node-search" placeholder="e.g. MinecraftServer"><span id="search-count" class="muted"></span></div>
+            <div id="search-results" class="table-wrap"></div>
+          </div>
+        </div>
+
+        <div id="tab-health" class="tab-panel" hidden>
+          <div id="health-metrics" class="metric-grid"></div>
+          <article class="panel"><div class="card-head"><h3>Profiler windows</h3><span class="muted">raw window statistics</span></div><div id="windows" class="table-wrap"></div></article>
+        </div>
+
+        <div id="tab-system" class="tab-panel" hidden>
+          <div class="dashboard-grid">
+            <article class="panel"><div class="card-head"><h3>JVM & operating system</h3></div><dl id="system-details" class="details"></dl></article>
+            <article class="panel"><div class="card-head"><h3>Memory & garbage collection</h3></div><pre id="memory-details" class="json-box"></pre></article>
+            <article class="panel span-2"><div class="card-head"><h3>World snapshot</h3><span class="muted">entities, worlds, and chunks</span></div><pre id="world-details" class="json-box"></pre></article>
+          </div>
+        </div>
+
+        <div id="tab-configurations" class="tab-panel" hidden>
+          <div class="panel">
+            <div class="card-head"><h3>Server configurations</h3><span class="muted">reported by Spark</span></div>
+            <div id="server-configurations" class="table-wrap"></div>
+          </div>
+        </div>
+
+        <div id="tab-plugins" class="tab-panel" hidden>
+          <div class="panel">
+            <div class="card-head"><h3>Plugins / mods by sampled usage</h3><span id="plugin-count" class="muted"></span></div>
+            <div class="search-row"><input id="plugin-search" placeholder="Search plugins, authors, versions, or descriptions"><span class="muted">expand a row for details</span></div>
+            <div id="plugin-performance"></div>
+          </div>
+        </div>
+
+        <div id="tab-raw" class="tab-panel" hidden>
+          <article class="panel"><div class="card-head"><h3>Normalized decoded JSON</h3><button id="download-button" class="button secondary" type="button">Download</button></div><pre id="raw-json" class="json-box raw"></pre></article>
+        </div>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

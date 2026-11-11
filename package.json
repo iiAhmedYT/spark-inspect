@@ -1,0 +1,15 @@
+{
+  "name": "spark-inspect",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Hosted deterministic inspection API for lucko/spark reports",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "protobufjs": "^7.4.0"
+  },
+  "scripts": {
+    "dev": "vercel dev"
+  }
+}

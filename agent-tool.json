@@ -1,0 +1,27 @@
+{
+  "name": "spark-inspect",
+  "description": "Deterministically fetch and decode Lucko Spark profiler reports into structured JSON. Completed reports are edge-cacheable; live profiler payloads are marked live and never cached. This tool reports data only; it does not diagnose or recommend.",
+  "endpoint": "/api/inspect",
+  "transport": "https",
+  "input": {
+    "url": "https://spark.lucko.me/<code>",
+    "operation": "overview|metadata|plugins|statistics|threads|hotspots|search|tree|plugin-tree|entries",
+    "limit": "optional integer for hotspots",
+    "q": "required for search",
+    "thread": "required for tree; optional for plugin-tree",
+    "source": "required for plugin-tree; plugin/source name from pluginPerformance"
+  },
+  "operations": {
+    "overview": "Report metadata, statistics, sampler roots, hotspots, and windows",
+    "metadata": "Report metadata, platform, plugins, and configuration",
+    "plugins": "Plugin/mod metadata, server configuration, and sampler-attributed performance records",
+    "statistics": "Platform, system, metrics, and profiler window statistics",
+    "threads": "Sampler thread roots and sample-window counts",
+    "hotspots": "Flattened sampler nodes ordered by sampled time",
+    "search": "Sampler nodes whose method name contains q",
+    "tree": "Resolved sampler call tree for a named thread",
+    "plugin-tree": "Resolved call branches containing a mapped plugin/source",
+    "entries": "Heap report entries"
+    ,"live": "Whether the payload includes Spark live-profiler channel information"
+  }
+}
