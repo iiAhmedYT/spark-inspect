@@ -8,14 +8,12 @@
 <p align="center">
   <a href="https://spark-inspect.vercel.app"><img src="https://img.shields.io/badge/live_app-spark--inspect.vercel.app-d7f36a?style=for-the-badge&labelColor=111510" alt="Live app"></a>
   <a href="https://spark-inspect.vercel.app/api/inspect"><img src="https://img.shields.io/badge/API-online-ff9a5c?style=for-the-badge&labelColor=111510" alt="API online"></a>
-  <a href="https://github.com/lucko/spark"><img src="https://img.shields.io/badge/works_with-Lucko%20Spark-8b7cff?style=for-the-badge&labelColor=111510" alt="Works with Lucko Spark"></a>
+  <a href="https://github.com/lucko/spark"><img src="https://img.shields.io/badge/works_with-Lucko%2FSpark-8b7cff?style=for-the-badge&labelColor=111510" alt="Works with Lucko/Spark"></a>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Node.js-18%2B-5fa04e?style=flat-square&logo=node.js&logoColor=white" alt="Node.js 18 or newer">
   <img src="https://img.shields.io/badge/protobufjs-7.x-blue?style=flat-square" alt="protobufjs 7">
-  <img src="https://img.shields.io/badge/agent-ready-yes-d7f36a?style=flat-square&labelColor=303820" alt="Agent ready">
-  <img src="https://img.shields.io/badge/no_build_step-static-9ca3af?style=flat-square" alt="No build step">
 </p>
 
 Spark Inspect is a public, no-installation workbench and JSON API for inspecting
